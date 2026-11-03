@@ -1,122 +1,65 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { Canvas } from '@react-three/fiber'
+import { OrbitControls, Html } from '@react-three/drei'
 
-function App() {
-  const [count, setCount] = useState(0)
+const agents = [
+  { nama: 'Claude', warna: '#d97757', pos: [-3, 0, -2] },
+  { nama: 'Flow', warna: '#4f8cff', pos: [3, 0, -2] },
+  { nama: 'Gemini', warna: '#8e63ff', pos: [-3, 0, 2.5] },
+  { nama: 'Hermes', warna: '#2dbf8a', pos: [3, 0, 2.5] },
+]
 
+function Meja({ nama, warna, pos }) {
+  const kaki = [[-0.9, -0.4], [0.9, -0.4], [-0.9, 0.4], [0.9, 0.4]]
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <group position={pos}>
+      <mesh position={[0, 0.75, 0]}>
+        <boxGeometry args={[2, 0.1, 1]} />
+        <meshStandardMaterial color="#8b5a2b" />
+      </mesh>
+      {kaki.map(([x, z], i) => (
+        <mesh key={i} position={[x, 0.37, z]}>
+          <boxGeometry args={[0.1, 0.75, 0.1]} />
+          <meshStandardMaterial color="#5c3a1a" />
+        </mesh>
+      ))}
+      <mesh position={[0, 1.15, -0.2]}>
+        <boxGeometry args={[0.9, 0.55, 0.05]} />
+        <meshStandardMaterial color="#222" />
+      </mesh>
+      <mesh position={[0, 1.15, -0.17]}>
+        <planeGeometry args={[0.8, 0.45]} />
+        <meshStandardMaterial color={warna} emissive={warna} emissiveIntensity={0.6} />
+      </mesh>
+      <group position={[0, 0, 1.1]}>
+        <mesh position={[0, 0.5, 0]}>
+          <cylinderGeometry args={[0.25, 0.25, 0.6, 16]} />
+          <meshStandardMaterial color={warna} />
+        </mesh>
+        <mesh position={[0, 1.0, 0]}>
+          <sphereGeometry args={[0.22, 16, 16]} />
+          <meshStandardMaterial color="#ffe0bd" />
+        </mesh>
+        <Html position={[0, 1.5, 0]} center distanceFactor={8}>
+          <div style={{ background: 'rgba(0,0,0,.65)', color: '#fff', padding: '2px 8px', borderRadius: 6, fontSize: 14, whiteSpace: 'nowrap' }}>
+            {nama}
+          </div>
+        </Html>
+      </group>
+    </group>
   )
 }
 
-export default App
+export default function App() {
+  return (
+    <Canvas camera={{ position: [0, 7, 10], fov: 50 }}>
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[5, 10, 5]} intensity={1.2} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[14, 10]} />
+        <meshStandardMaterial color="#d9d4c7" />
+      </mesh>
+      {agents.map((a) => <Meja key={a.nama} {...a} />)}
+      <OrbitControls />
+    </Canvas>
+  )
+}
